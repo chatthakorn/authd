@@ -1,5 +1,5 @@
 export class CreateTodoDto {
-  readonly todo_id: string;
+  readonly create_by: string;
   readonly text: string;
   readonly status?: boolean;
 }
