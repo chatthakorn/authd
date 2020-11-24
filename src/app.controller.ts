@@ -1,4 +1,14 @@
-import { Controller, Request, Post, UseGuards, Get } from '@nestjs/common';
+import {
+  Controller,
+  Request,
+  Post,
+  UseGuards,
+  Get,
+  Patch,
+  Param,
+  Body,
+  Delete,
+} from '@nestjs/common';
 import { AppService } from './app.service';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { AuthService } from './auth/auth.service';
@@ -18,6 +28,15 @@ export class AppController {
     return this.appService.getHello();
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Post('/profile')
+  async create(
+    @Body('create_by') create_by: string,
+    @Body('text') text: string,
+  ) {
+    return await this.todoService.create({ create_by, text });
+  }
+
   @UseGuards(LocalAuthGuard)
   @Post('auth/login')
   async login(@Request() req: any): Promise<any> {
@@ -26,12 +45,38 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('profile')
+  @Get('profile/todoes')
   async getProfile(@Request() req: any): Promise<any> {
-    const todos: any[] = await this.todoService.findTodo(req.user['_id']);
+    const todoes: any[] = (
+      await this.todoService.findTodo(req.user['_id'])
+    ).filter((todo) => todo.status === false);
     return {
-      todos: [...todos],
+      todoes: [...todoes],
       user: req.user,
     };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('profile/todoed')
+  async getProfileTodoed(@Request() req: any): Promise<any> {
+    const todoes: any[] = (
+      await this.todoService.findTodoed(req.user['_id'])
+    ).filter((todo) => todo.status === true);
+    return {
+      todoes: [...todoes],
+      user: req.user,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('profile/:id')
+  async done(@Param('id') id: string, @Body('status') status: boolean) {
+    return await this.todoService.done(id, status);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Delete('profile/:id')
+  async destroy(@Param('id') id: string) {
+    return await this.todoService.destroy(id);
   }
 }

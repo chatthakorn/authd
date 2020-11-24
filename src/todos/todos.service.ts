@@ -14,10 +14,22 @@ export class TodosService {
   }
 
   async findTodo(id: any): Promise<any[]> {
-    return this.todoModel.aggregate([
+    return await this.todoModel.aggregate([
       {
         $match: { create_by: id },
       },
     ]);
+  }
+
+  async findTodoed(id: any): Promise<any[]> {
+    return await this.todoModel.aggregate([{ $match: { create_by: id } }]);
+  }
+
+  async done(id: string, status: boolean) {
+    return await this.todoModel.updateOne({ _id: id }, { $set: { status } });
+  }
+
+  async destroy(id: string) {
+    return await this.todoModel.deleteOne({ _id: id }).exec();
   }
 }

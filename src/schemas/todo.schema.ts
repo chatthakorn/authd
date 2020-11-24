@@ -6,7 +6,7 @@ export type TodoDocument = Todo & Document;
 @Schema()
 export class Todo {
   @Prop()
-  create_by: string;
+  create_by?: string;
 
   @Prop()
   text: string;

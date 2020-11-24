@@ -13,7 +13,7 @@ export class UsersService {
     return await createUser.save();
   }
 
-  async findUser(email: string) {
+  async findUser(email: string): Promise<UserDocument> {
     return await this.userModel.findOne({ email }).exec();
   }
 }
